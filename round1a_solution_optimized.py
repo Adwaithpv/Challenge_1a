@@ -533,15 +533,148 @@ class OptimizedRound1ASolutionEngine:
         }
 
 
+def process_all_pdfs_in_directory():
+    """
+    Process all PDF files in sample_dataset/pdfs/ directory and output JSON files to sample_dataset/outputs/
+    """
+    # Define input and output directories
+    pdfs_dir = Path("sample_dataset/pdfs")
+    outputs_dir = Path("sample_dataset/outputs")
+    
+    # Validate directories exist
+    if not pdfs_dir.exists():
+        print(f"❌ Error: PDFs directory not found: {pdfs_dir}")
+        return False
+        
+    # Create output directory if it doesn't exist
+    outputs_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Find all PDF files
+    pdf_files = list(pdfs_dir.glob("*.pdf"))
+    if not pdf_files:
+        print(f"⚠️  No PDF files found in {pdfs_dir}")
+        return False
+    
+    print(f"🔍 Found {len(pdf_files)} PDF files to process")
+    print(f"📂 Input directory: {pdfs_dir}")
+    print(f"📂 Output directory: {outputs_dir}")
+    print(f"{'='*60}")
+    
+    # Initialize the processing engine
+    engine = OptimizedRound1ASolutionEngine(
+        max_workers=None,  # Auto-detect optimal workers
+        enable_memory_optimization=True
+    )
+    
+    # Process each PDF file
+    total_start_time = time.time()
+    processed_count = 0
+    failed_count = 0
+    
+    for i, pdf_file in enumerate(pdf_files, 1):
+        print(f"\n📄 Processing {i}/{len(pdf_files)}: {pdf_file.name}")
+        
+        # Generate output file path
+        output_file = outputs_dir / f"{pdf_file.stem}.json"
+        
+        # Check if output already exists
+        if output_file.exists():
+            print(f"⚠️  Output file already exists: {output_file.name}")
+            user_input = input("   Overwrite? (y/n/s=skip): ").lower().strip()
+            if user_input == 'n':
+                print("   Skipping file...")
+                continue
+            elif user_input == 's':
+                print("   Skipping file...")
+                continue
+            # If 'y' or anything else, continue with processing
+        
+        try:
+            # Process the PDF
+            file_start_time = time.time()
+            result = engine.extract_document_structure(str(pdf_file))
+            processing_time = time.time() - file_start_time
+            
+            # Add file-specific metadata
+            if isinstance(result, dict):
+                result["source_file"] = pdf_file.name
+                result["output_file"] = output_file.name
+                result["processing_time_seconds"] = round(processing_time, 2)
+            
+            # Post-process and format JSON output
+            from post_process_output import JSONPostProcessor
+            
+            processor = JSONPostProcessor()
+            processed_result = processor.validate_and_fix_structure(result)
+            json_output = processor.format_json(processed_result, indent=2)
+            
+            # Save to output file
+            output_file.write_text(json_output, encoding='utf-8')
+            
+            print(f"✅ Completed in {processing_time:.2f}s → {output_file.name}")
+            processed_count += 1
+            
+        except Exception as e:
+            print(f"❌ Error processing {pdf_file.name}: {e}")
+            failed_count += 1
+            
+            # Save error information to a .error file
+            error_file = outputs_dir / f"{pdf_file.stem}.error"
+            error_info = {
+                "source_file": pdf_file.name,
+                "error": str(e),
+                "timestamp": time.time()
+            }
+            error_file.write_text(json.dumps(error_info, indent=2), encoding='utf-8')
+    
+    # Print summary
+    total_time = time.time() - total_start_time
+    print(f"\n{'='*60}")
+    print(f"🎯 BATCH PROCESSING SUMMARY")
+    print(f"{'='*60}")
+    print(f"Total files processed: {processed_count}/{len(pdf_files)}")
+    print(f"Failed: {failed_count}")
+    print(f"Total processing time: {total_time:.2f}s")
+    print(f"Average time per file: {total_time/len(pdf_files):.2f}s")
+    
+    if processed_count > 0:
+        print(f"✅ Success! {processed_count} JSON files saved to {outputs_dir}")
+    
+    return failed_count == 0
+
+
 def main():
     """Main entry point for optimized Round 1A solution."""
     parser = argparse.ArgumentParser(
-        description="Round 1A: Extract structured outlines from PDF files (OPTIMIZED)"
+        description="Round 1A: Extract structured outlines from PDF files (OPTIMIZED)",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Process a single PDF file
+  python round1a_solution_optimized.py document.pdf
+  
+  # Process all PDFs in sample_dataset/pdfs/ directory
+  python round1a_solution_optimized.py --batch
+  
+  # Process single PDF with custom output
+  python round1a_solution_optimized.py document.pdf -o output.json
+        """
     )
-    parser.add_argument("pdf_file", help="Path to PDF file")
+    
+    # Make pdf_file optional when using batch mode
+    parser.add_argument(
+        "pdf_file", 
+        nargs='?',
+        help="Path to PDF file (not needed for --batch mode)"
+    )
     parser.add_argument(
         "-o", "--output", 
-        help="Output JSON file (default: print to stdout)"
+        help="Output JSON file (default: print to stdout, not used in batch mode)"
+    )
+    parser.add_argument(
+        "--batch",
+        action="store_true",
+        help="Process all PDFs in sample_dataset/pdfs/ directory"
     )
     parser.add_argument(
         "--pretty", 
@@ -561,6 +694,18 @@ def main():
     )
     
     args = parser.parse_args()
+    
+    # Handle batch processing mode
+    if args.batch:
+        print("🚀 Starting batch processing mode...")
+        success = process_all_pdfs_in_directory()
+        sys.exit(0 if success else 1)
+    
+    # Handle single file processing mode
+    if not args.pdf_file:
+        print("Error: PDF file argument required when not using --batch mode")
+        parser.print_help()
+        sys.exit(1)
     
     # Validate input file
     pdf_path = Path(args.pdf_file)
