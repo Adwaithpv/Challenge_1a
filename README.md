@@ -54,7 +54,7 @@ The easiest way to run the solution is using Docker, which handles all dependenc
 cd Challenge_1a
 
 # Build the Docker image (requires internet for downloading models)
-docker build -t pdf-processor .
+docker build --platform linux/amd64 -t pdf-processor .
 ```
 
 **Note**: The build process downloads HuggingFace models during image creation, so internet access is required only during the build phase.
@@ -67,6 +67,7 @@ docker run --rm -v "$(PWD)/sample_dataset/pdfs:/app/input:ro" -v "$(PWD)/sample_
 
 # Linux/macOS
 docker run --rm -v $(pwd)/sample_dataset/pdfs:/app/input:ro -v $(pwd)/sample_dataset/outputs:/app/output --network none pdf-processor
+
 
 ```
 
