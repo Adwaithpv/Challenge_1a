@@ -1,18 +1,24 @@
 # Git and version control
 .git
 .gitignore
+.gitattributes
 
-# Docker files
-Dockerfile
-.dockerignore
+# Documentation
+*.md
+!DOCKER_README.md
 
-# Python cache and compiled files
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python cache and build artifacts
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -26,66 +32,41 @@ parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # Virtual environments
 venv/
 env/
 ENV/
 
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
 # OS files
 .DS_Store
 Thumbs.db
 
-# Test files and directories
-test_*
-*_test.py
-tests/
+# Logs
+*.log
+
+# Test files (keep test_setup.py)
+**/tests/
+!test_setup.py
 
 # Temporary files
+tmp/
+temp/
 *.tmp
 *.temp
-temp/
-tmp/
 
-# XML output files (these are generated during processing)
-xmls/
-*.xml
+# Docker files (except main ones)
+docker-compose*.yml
+.dockerignore
 
-# Log files
-*.log
-logs/
+# IDE settings
+.vscode/
+.idea/
 
-# Jupyter notebooks
-*.ipynb
-.ipynb_checkpoints/
-
-# Documentation
-*.md
-docs/
-
-# Local configuration files
+# Local development
+*.local
 .env
-.env.local
-.env.*.local
-
-# Coverage reports
-htmlcov/
-.coverage
-.coverage.*
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/ 
+.env.local 

@@ -15,6 +15,9 @@ RUN apt-get update && apt-get install -y \
     libgomp1 \
     libgcc-s1 \
     git \
+    # OpenCV dependencies
+    libgl1-mesa-glx \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Create input and output directories
@@ -26,6 +29,9 @@ COPY requirements.txt .
 # Install PyTorch CPU version first
 RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
+# Install numpy explicitly to avoid build conflicts
+RUN pip install --no-cache-dir "numpy>=1.21.0,<1.25.0"
+
 # Install detectron2 from source (more reliable than pre-built wheels)
 RUN pip install --no-cache-dir 'git+https://github.com/facebookresearch/detectron2.git'
 
@@ -35,26 +41,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY . .
 
-# Create missing __init__.py files for all Python packages
+# Create missing __init__.py files for all Python packages (this handles all directories safely)
 RUN find /app/src -type d -exec touch {}/__init__.py \;
-
-# Create __init__.py files for specific directories that need them
-RUN echo "# Package initialization" > /app/src/__init__.py && \
-    echo "# Package initialization" > /app/src/data_model/__init__.py && \
-    echo "# Package initialization" > /app/src/extraction_formats/__init__.py && \
-    echo "# Package initialization" > /app/src/fast_trainer/__init__.py && \
-    echo "# Package initialization" > /app/src/model_configuration/__init__.py && \
-    echo "# Package initialization" > /app/src/pdf_features/__init__.py && \
-    echo "# Package initialization" > /app/src/pdf_features/tests/__init__.py && \
-    echo "# Package initialization" > /app/src/pdf_layout_analysis/__init__.py && \
-    echo "# Package initialization" > /app/src/pdf_token_type_labels/__init__.py && \
-    echo "# Package initialization" > /app/src/pdf_tokens_type_trainer/__init__.py && \
-    echo "# Package initialization" > /app/src/pdf_tokens_type_trainer/tests/__init__.py && \
-    echo "# Package initialization" > /app/src/toc/__init__.py && \
-    echo "# Package initialization" > /app/src/toc/data/__init__.py && \
-    echo "# Package initialization" > /app/src/toc/methods/__init__.py && \
-    echo "# Package initialization" > /app/src/toc/methods/two_models_v3_segments_context_2/__init__.py && \
-    echo "# Package initialization" > /app/src/vgt/__init__.py
 
 # Install the package in development mode to handle dependencies
 RUN pip install -e .

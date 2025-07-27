@@ -1,7 +1,7 @@
 # Core ML and Deep Learning
 # torch and torchvision are installed separately in Dockerfile for CPU version
 lightgbm>=3.3.0
-numpy>=1.21.0
+numpy>=1.21.0,<1.25.0
 
 # Computer Vision (headless version for Docker)
 opencv-python-headless>=4.5.0
@@ -38,8 +38,8 @@ easyocr>=1.6.0
 typing-extensions>=4.0.0
 
 # Formula and Table Extraction (optional)
-# rapid-latex-ocr>=0.0.9  # Commented out - optional dependency
-# struct-eqtable>=0.1.0   # Commented out - package not available
+rapid-latex-ocr>=0.0.8  # Commented out - causes numpy build conflicts in Docker
+struct-eqtable==0.3.2   # NOT AVAILABLE - Custom package for table structure extraction
 
 # Additional utilities
 roman>=3.3
