@@ -47,6 +47,30 @@ RUN find /app/src -type d -exec touch {}/__init__.py \;
 # Install the package in development mode to handle dependencies
 RUN pip install -e .
 
+# Download HuggingFace models during build time so they're available offline
+RUN python -c "\
+import os; \
+os.environ['PYTHONPATH'] = '/app:/app/src'; \
+from huggingface_hub import hf_hub_download; \
+print('Downloading pdf_tokens_type.model...'); \
+pdf_tokens_type_model = hf_hub_download( \
+    repo_id='HURIDOCS/pdf-segmentation', \
+    filename='pdf_tokens_type.model', \
+    revision='c71f833500707201db9f3649a6d2010d3ce9d4c9', \
+    cache_dir='/app/models/.huggingface' \
+); \
+print(f'Downloaded to: {pdf_tokens_type_model}'); \
+print('Downloading token type finding config...'); \
+token_type_finding_config_path = hf_hub_download( \
+    repo_id='HURIDOCS/pdf-segmentation', \
+    filename='tag_type_finding_model_config.txt', \
+    revision='7d98776dd34acb2fe3a06495c82e64b9c84bdc16', \
+    cache_dir='/app/models/.huggingface' \
+); \
+print(f'Downloaded to: {token_type_finding_config_path}'); \
+print('All models downloaded successfully!') \
+"
+
 # Ensure models directory exists and is accessible
 RUN mkdir -p /app/models && chmod -R 755 /app/models
 
