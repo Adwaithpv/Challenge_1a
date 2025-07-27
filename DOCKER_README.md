@@ -11,33 +11,41 @@ The Docker container automatically processes all PDF files from `/app/input` dir
 Build the Docker image using the exact command format expected by the hackathon:
 
 ```bash
-docker build --platform linux/amd64 -t mysolutionname:somerandomidentifier .
+docker build --platform linux/amd64 -t pdf-processor .
 ```
 
 ### Example Build Commands
 
 ```bash
 # Example with specific names
-docker build --platform linux/amd64 -t round1a-solution:v1.0 .
+docker build --platform linux/amd64 -t pdf-processor:v1.0 .
 
 # Example with team name
-docker build --platform linux/amd64 -t team-awesome-pdf:hackathon2024 .
+docker build --platform linux/amd64 -t pdf-processor:hackathon2024 .
 ```
 
 ## 🚀 Running the Container
 
-Run the solution using the exact command format specified in the hackathon requirements:
+Run the solution using this command format:
 
 ```bash
-docker run --rm -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output --network none mysolutionname:somerandomidentifier
+docker run --rm -v $(PWD)\sample_dataset/pdfs:/app/input:ro -v $(PWD)\sample_dataset/outputs:/app/output --network none pdf-processor
 ```
+
+### Command Breakdown
+
+- `--rm`: Automatically removes the container after execution
+- `-v $(PWD)\sample_dataset/pdfs:/app/input:ro`: Mounts local `sample_dataset/pdfs` directory to container's `/app/input` (read-only)
+- `-v $(PWD)\sample_dataset/outputs:/app/output`: Mounts local `sample_dataset/outputs` directory to container's `/app/output`
+- `--network none`: Ensures offline operation as required
+- `pdf-processor`: The Docker image name
 
 ### Important Notes
 
-- **Input Directory**: Place your PDF files in a local `input/` directory
-- **Output Directory**: Results will be saved to a local `output/` directory
+- **Input Directory**: Place your PDF files in `sample_dataset/pdfs/` directory
+- **Output Directory**: Results will be saved to `sample_dataset/outputs/` directory
 - **Network Isolation**: `--network none` ensures offline operation as required
-- **Auto-cleanup**: `--rm` automatically removes the container after execution
+- **Read-only Input**: The `:ro` flag makes the input directory read-only for security
 
 ## 📁 Directory Structure
 
@@ -45,11 +53,15 @@ Before running, ensure your directory structure looks like this:
 
 ```
 your-project/
-├── input/                    # Create this directory
-│   ├── document1.pdf        # Your PDF files
-│   ├── document2.pdf
-│   └── report.pdf
-├── output/                   # Create this directory (will be populated by container)
+├── sample_dataset/
+│   ├── pdfs/                     # Input directory - place your PDF files here
+│   │   ├── document1.pdf        # Your PDF files
+│   │   ├── document2.pdf
+│   │   └── report.pdf
+│   └── outputs/                  # Output directory (will be created if it doesn't exist)
+│       ├── document1.json       # Generated JSON files will appear here
+│       ├── document2.json
+│       └── report.json
 └── ... (other project files)
 ```
 
@@ -58,33 +70,45 @@ your-project/
 ### 1. Prepare Directories
 
 ```bash
-# Create input and output directories
-mkdir -p input output
+# Create the required directory structure
+mkdir -p sample_dataset/pdfs sample_dataset/outputs
 
-# Copy your PDF files to input directory
-cp /path/to/your/pdfs/*.pdf input/
+# Copy your PDF files to the input directory
+cp /path/to/your/pdfs/*.pdf sample_dataset/pdfs/
 ```
 
 ### 2. Build the Docker Image
 
 ```bash
-docker build --platform linux/amd64 -t pdf-processor:hackathon .
+docker build --platform linux/amd64 -t pdf-processor .
 ```
 
 ### 3. Run the Processing
 
 ```bash
-docker run --rm -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output --network none pdf-processor:hackathon
+docker run --rm -v $(PWD)\sample_dataset/pdfs:/app/input:ro -v $(PWD)\sample_dataset/outputs:/app/output --network none pdf-processor
 ```
 
 ### 4. Check Results
 
 ```bash
 # List generated JSON files
-ls -la output/
+ls -la sample_dataset/outputs/
 
-# View a result file
-cat output/document1.json
+# View a specific result
+cat sample_dataset/outputs/document1.json
+```
+
+## 🔧 Alternative Directory Structures
+
+If you prefer a different directory structure, you can adjust the volume mounts:
+
+```bash
+# Using different local directories
+docker run --rm -v $(PWD)/input:/app/input:ro -v $(PWD)/output:/app/output --network none pdf-processor
+
+# Using absolute paths
+docker run --rm -v /path/to/pdfs:/app/input:ro -v /path/to/outputs:/app/output --network none pdf-processor
 ```
 
 ## 📄 Expected Output Format

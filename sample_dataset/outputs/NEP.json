@@ -1,45 +1,45 @@
 {
-  "title": "National Education Policy 2020",
+  "title": "1. Early Childhood Care and Education: The Foundation of Learning",
   "outline": [
     {
       "level": "H2",
+      "text": "National Education Policy 2020",
+      "page": 1
+    },
+    {
+      "level": "H1",
       "text": "PART II.  HIGHER EDUCATION",
       "page": 2
     },
     {
-      "level": "H2",
+      "level": "H1",
       "text": "PART IV.  MAKING IT HAPPEN",
       "page": 3
     },
     {
-      "level": "H1",
+      "level": "H2",
       "text": "Introduction",
       "page": 4
     },
     {
-      "level": "H1",
+      "level": "H2",
       "text": "Previous Policies",
       "page": 5
     },
     {
-      "level": "H1",
+      "level": "H2",
       "text": "Principles of this Policy",
       "page": 5
     },
     {
-      "level": "H1",
+      "level": "H2",
       "text": "The Vision of this Policy",
       "page": 7
     },
     {
-      "level": "H1",
+      "level": "H2",
       "text": "Part I. SCHOOL EDUCATION",
       "page": 7
-    },
-    {
-      "level": "H1",
-      "text": "1. Early Childhood Care and Education: The Foundation of Learning",
-      "page": 8
     },
     {
       "level": "H1",
@@ -138,12 +138,12 @@
     },
     {
       "level": "H1",
-      "text": "Approach to Teacher Education",
+      "text": "Special educators",
       "page": 24
     },
     {
       "level": "H1",
-      "text": "Special educators",
+      "text": "Approach to Teacher Education",
       "page": 24
     },
     {

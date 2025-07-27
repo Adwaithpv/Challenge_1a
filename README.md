@@ -54,7 +54,7 @@ The easiest way to run the solution is using Docker, which handles all dependenc
 cd Challenge_1a
 
 # Build the Docker image (requires internet for downloading models)
-docker build -t round1a-solution:test .
+docker build -t pdf-processor .
 ```
 
 **Note**: The build process downloads HuggingFace models during image creation, so internet access is required only during the build phase.
@@ -63,28 +63,28 @@ docker build -t round1a-solution:test .
 
 ```bash
 # Windows PowerShell
-docker run --rm -v "${PWD}\input:/app/input:ro" -v "${PWD}\output:/app/output" --network none round1a-solution:test
+docker run --rm -v "$(PWD)/sample_dataset/pdfs:/app/input:ro" -v "$(PWD)/sample_dataset/outputs:/app/output" --network none pdf-processor
 
 # Linux/macOS
-docker run --rm -v "$(pwd)/input:/app/input:ro" -v "$(pwd)/output:/app/output" --network none round1a-solution:test
+docker run --rm -v $(pwd)/sample_dataset/pdfs:/app/input:ro -v $(pwd)/sample_dataset/outputs:/app/output --network none pdf-processor
+
 ```
 
 ### 3. Input/Output Setup
 
 ```bash
 # Place your PDF files in the input directory
-mkdir input output
-cp your_document.pdf input/
+cp your_document.pdf sample_dataset/pdfs/
 
 # After running, check the output directory
-ls output/
+ls sample_dataset/outputs/
 ```
 
 ### Docker Command Explanation
 
 - `--rm`: Remove container after execution
-- `-v "${PWD}\input:/app/input:ro"`: Mount input directory as read-only
-- `-v "${PWD}\output:/app/output"`: Mount output directory for results
+- `-v $(PWD)\sample_dataset/pdfs:/app/input:ro`: Mount input directory as read-only
+- `-v $(PWD)\sample_dataset/outputs:/app/output`: Mount output directory for results
 - `--network none`: Run in complete offline mode (no internet access)
 
 ## 📦 Manual Installation & Setup
@@ -213,8 +213,13 @@ Challenge_1a/
 ├── round1a_solution_optimized.py # Optimized version
 ├── post_process_output.py       # JSON post-processing utilities
 ├── run_with_post_processing.py  # Wrapper with automatic post-processing
-├── input/                       # Input PDF files directory
-├── output/                      # Output JSON files directory
+├── sample_dataset/              # Sample data directory structure
+│   ├── pdfs/                    # Input PDF files directory
+│   │   ├── document1.pdf        # Your PDF files
+│   │   └── document2.pdf
+│   └── outputs/                 # Output JSON files directory
+│       ├── document1.json       # Generated JSON files
+│       └── document2.json
 ├── models/                      # Pre-trained ML models
 │   ├── token_type_lightgbm.model
 │   ├── paragraph_extraction_lightgbm.model
@@ -295,24 +300,24 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Reduce TensorFlow logging
 
 ```bash
 # Test with sample documents using Docker
-docker run --rm -v "${PWD}\input:/app/input:ro" -v "${PWD}\output:/app/output" --network none round1a-solution:test
+docker run --rm -v $(PWD)\sample_dataset/pdfs:/app/input:ro -v $(PWD)\sample_dataset/outputs:/app/output --network none pdf-processor
 
 # Check processing results
-cat output/your_document.json
+cat sample_dataset/outputs/your_document.json
 ```
 
 ### Manual Testing
 
 ```bash
 # Test with sample document
-python round1a_solution.py test_pdfs/NEP.pdf --pretty
+python round1a_solution.py sample_dataset/pdfs/NEP.pdf --pretty
 
 # Test performance
-time python round1a_solution.py test_pdfs/NEP.pdf
+time python round1a_solution.py sample_dataset/pdfs/NEP.pdf
 
 # Test with different document types
-python round1a_solution.py test_pdfs/table.pdf --pretty
-python round1a_solution.py test_pdfs/formula.pdf --pretty
+python round1a_solution.py sample_dataset/pdfs/table.pdf --pretty
+python round1a_solution.py sample_dataset/pdfs/formula.pdf --pretty
 ```
 
 ## 🔍 Troubleshooting
@@ -322,22 +327,22 @@ python round1a_solution.py test_pdfs/formula.pdf --pretty
 1. **Build fails downloading models**
    ```bash
    # Ensure internet connection during build
-   docker build --no-cache -t round1a-solution:test .
+   docker build --no-cache -t pdf-processor .
    ```
 
 2. **"Permission denied" errors**
    ```bash
    # On Linux/macOS, ensure proper permissions
-   chmod -R 755 input output
+   chmod -R 755 sample_dataset/pdfs sample_dataset/outputs
    ```
 
 3. **Container fails to start**
    ```bash
    # Check if directories exist
-   mkdir -p input output
+   mkdir -p sample_dataset/pdfs sample_dataset/outputs
    
    # Verify Docker build succeeded
-   docker images | grep round1a-solution
+   docker images | grep pdf-processor
    ```
 
 ### Common Issues
@@ -385,13 +390,13 @@ python round1a_solution.py test_pdfs/formula.pdf --pretty
 
 ```bash
 # Basic Docker run (offline mode)
-docker run --rm -v "${PWD}\input:/app/input:ro" -v "${PWD}\output:/app/output" --network none round1a-solution:test
+docker run --rm -v $(PWD)\sample_dataset/pdfs:/app/input:ro -v $(PWD)\sample_dataset/outputs:/app/output --network none pdf-processor
 
 # Docker run with custom directories (Windows)
-docker run --rm -v "C:\path\to\pdfs:/app/input:ro" -v "C:\path\to\output:/app/output" --network none round1a-solution:test
+docker run --rm -v "C:\path\to\pdfs:/app/input:ro" -v "C:\path\to\output:/app/output" --network none pdf-processor
 
 # Docker run with custom directories (Linux/macOS)
-docker run --rm -v "/path/to/pdfs:/app/input:ro" -v "/path/to/output:/app/output" --network none round1a-solution:test
+docker run --rm -v "/path/to/pdfs:/app/input:ro" -v "/path/to/output:/app/output" --network none pdf-processor
 ```
 
 ### Manual Command Line Arguments
@@ -469,14 +474,14 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Reduce TensorFlow logging
 
 ```bash
 # Build the production image
-docker build -t round1a-solution:latest .
+docker build -t pdf-processor:latest .
 
 # Run in production with mounted volumes
 docker run --rm \
-  -v "/path/to/input:/app/input:ro" \
-  -v "/path/to/output:/app/output" \
+  -v "/path/to/pdfs:/app/input:ro" \
+  -v "/path/to/outputs:/app/output" \
   --network none \
-  round1a-solution:latest
+  pdf-processor:latest
 ```
 
 ### Manual Production Setup
