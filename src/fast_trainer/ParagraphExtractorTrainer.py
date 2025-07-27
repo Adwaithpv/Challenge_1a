@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Union
 
 from fast_trainer.Paragraph import Paragraph
 from fast_trainer.PdfSegment import PdfSegment
@@ -37,7 +38,7 @@ class ParagraphExtractorTrainer(TokenTypeTrainer):
                 for token, next_token in zip(page.tokens, page.tokens[1:]):
                     yield page, token, next_token
 
-    def get_pdf_segments(self, paragraph_extractor_model_path: str | Path) -> list[PdfSegment]:
+    def get_pdf_segments(self, paragraph_extractor_model_path: Union[str, Path]) -> list[PdfSegment]:
         paragraphs = self.get_paragraphs(paragraph_extractor_model_path)
         pdf_segments = [PdfSegment.from_pdf_tokens(paragraph.tokens, paragraph.pdf_name) for paragraph in paragraphs]
 

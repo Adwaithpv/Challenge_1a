@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Union
 
 import numpy as np
 from tqdm import tqdm
@@ -49,7 +50,7 @@ class TokenTypeTrainer(PdfTrainer):
 
         return token_row_features
 
-    def predict(self, model_path: str | Path = None):
+    def predict(self, model_path: Union[str, Path] = None):
         predictions = super().predict(model_path)
         predictions_assigned = 0
         for token_features, page in self.loop_token_features():
@@ -60,7 +61,7 @@ class TokenTypeTrainer(PdfTrainer):
 
             predictions_assigned += len(page.tokens)
 
-    def set_token_types(self, model_path: str | Path = None):
+    def set_token_types(self, model_path: Union[str, Path] = None):
         self.predict(model_path)
         for token in self.loop_tokens():
             token.token_type = TokenType.from_index(token.prediction)

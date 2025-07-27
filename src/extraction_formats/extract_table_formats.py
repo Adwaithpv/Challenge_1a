@@ -3,7 +3,14 @@ from typing import Optional
 
 import torch
 from PIL import Image
-from struct_eqtable import build_model
+
+# Try to import optional dependency
+try:
+    from struct_eqtable import build_model
+    STRUCT_EQTABLE_AVAILABLE = True
+except ImportError:
+    STRUCT_EQTABLE_AVAILABLE = False
+    print("Warning: struct_eqtable not available. Table format extraction will be disabled.")
 
 from configuration import service_logger
 from data_model.PdfImages import PdfImages
@@ -18,6 +25,9 @@ def get_table_format(
     max_waiting_time: int = 1000,
     extraction_format: str = "latex",
 ) -> str:
+    if not STRUCT_EQTABLE_AVAILABLE:
+        return "[Table extraction not available - struct_eqtable not installed]"
+    
     from pypandoc import convert_text
 
     if not raw_image:
@@ -43,6 +53,8 @@ def get_table_format(
 
 
 def get_model():
+    if not STRUCT_EQTABLE_AVAILABLE:
+        return None
 
     ckpt_path: str = "U4R/StructTable-base"
     max_new_tokens: int = 2048
@@ -59,6 +71,10 @@ def get_model():
 
 
 def extract_table_format(pdf_images: PdfImages, predicted_segments: list[PdfSegment], extraction_format: str):
+    if not STRUCT_EQTABLE_AVAILABLE:
+        print("Warning: Table format extraction skipped - struct_eqtable not available")
+        return
+        
     table_segments = [
         (index, segment) for index, segment in enumerate(predicted_segments) if segment.segment_type == TokenType.TABLE
     ]
@@ -66,6 +82,8 @@ def extract_table_format(pdf_images: PdfImages, predicted_segments: list[PdfSegm
         return
 
     model = get_model()
+    if model is None:
+        return
 
     for index, table_segment in table_segments:
         page_image: Image = pdf_images.pdf_images[table_segment.page_number - 1]

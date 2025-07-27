@@ -8,6 +8,7 @@ from fast_trainer.PdfSegment import PdfSegment
 from pdf_features.PdfFeatures import PdfFeatures
 from pdf_features.PdfToken import PdfToken
 from pdf_features.Rectangle import Rectangle
+from typing import Optional
 from pdf_token_type_labels.TokenType import TokenType
 from data_model.PdfImages import PdfImages
 from configuration import ROOT_PATH, DOCLAYNET_TYPE_BY_ID
@@ -49,7 +50,7 @@ def get_vgt_predictions(model_name: str) -> dict[str, list[Prediction]]:
 
 def find_best_prediction_for_token(page_pdf_name, token, vgt_predictions_dict, most_probable_tokens_by_predictions):
     best_score: float = 0
-    most_probable_prediction: Prediction | None = None
+    most_probable_prediction: Optional[Prediction] = None
     for prediction in vgt_predictions_dict[page_pdf_name]:
         if prediction.score > best_score and prediction.bounding_box.get_intersection_percentage(token.bounding_box):
             best_score = prediction.score

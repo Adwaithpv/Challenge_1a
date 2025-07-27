@@ -1,6 +1,7 @@
 import os
 from os.path import exists, join
 from pathlib import Path
+from typing import Union
 
 import lightgbm as lgb
 import numpy as np
@@ -32,7 +33,7 @@ class PdfTrainer:
             x[i] = v
         return x
 
-    def train(self, model_path: str | Path, labels: list[int]):
+    def train(self, model_path: Union[str, Path], labels: list[int]):
         print(f"Getting model input")
         x_train = self.get_model_input()
 
@@ -70,7 +71,7 @@ class PdfTrainer:
             token_type=TokenType.TEXT,
         )
 
-    def predict(self, model_path: str | Path = None):
+    def predict(self, model_path: Union[str, Path] = None):
         model_path = model_path if model_path else pdf_tokens_type_model
         x = self.get_model_input()
 
@@ -80,7 +81,7 @@ class PdfTrainer:
         lightgbm_model = lgb.Booster(model_file=model_path)
         return lightgbm_model.predict(x)
 
-    def save_training_data(self, save_folder_path: str | Path, labels: list[int]):
+    def save_training_data(self, save_folder_path: Union[str, Path], labels: list[int]):
         os.makedirs(save_folder_path, exist_ok=True)
 
         x = self.get_model_input()

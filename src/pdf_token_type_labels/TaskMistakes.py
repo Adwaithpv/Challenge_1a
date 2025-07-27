@@ -8,6 +8,7 @@ from pdf_token_type_labels.PageLabels import PageLabels
 from pdf_token_type_labels.PdfLabels import PdfLabels
 from pdf_token_type_labels.TaskMistakesType import TaskMistakesType
 from pdf_tokens_type_trainer.config import LABELS_FILE_NAME, MISTAKES_RELATIVE_PATH, STATUS_FILE_NAME
+from typing import Union
 
 
 class TaskMistakes:
@@ -17,7 +18,7 @@ class TaskMistakes:
         self.pdf_name = pdf_name
         self.page_labels: list[PageLabels] = list()
 
-    def add(self, page_number: int, rectangle: Rectangle, truth: int, prediction: int | float, metadata: str = ""):
+    def add(self, page_number: int, rectangle: Rectangle, truth: int, prediction: Union[int, float], metadata: str = ""):
         token_type_label = Label.from_rectangle(rectangle, self.get_token_type(prediction, truth))
         token_type_label.metadata = metadata
         token_type_page = [x for x in self.page_labels if x.number == page_number]

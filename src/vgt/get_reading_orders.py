@@ -2,13 +2,14 @@ from fast_trainer.PdfSegment import PdfSegment
 from pdf_features.PdfPage import PdfPage
 from pdf_features.PdfToken import PdfToken
 from pdf_token_type_labels.TokenType import TokenType
+from typing import Optional
 
 from data_model.PdfImages import PdfImages
 
 
 def find_segment_for_token(token: PdfToken, segments: list[PdfSegment], tokens_by_segments):
     best_score: float = 0
-    most_probable_segment: PdfSegment | None = None
+    most_probable_segment: Optional[PdfSegment] = None
     for segment in segments:
         intersection_percentage = token.bounding_box.get_intersection_percentage(segment.bounding_box)
         if intersection_percentage > best_score:
@@ -58,7 +59,7 @@ def get_ordered_segments_for_page(segments_for_page: list[PdfSegment], page: Pdf
     for token in page.tokens:
         find_segment_for_token(token, segments_for_page, tokens_by_segments)
 
-    page_number_segment: None | PdfSegment = None
+    page_number_segment: Optional[PdfSegment] = None
     if tokens_by_segments:
         last_segment = max(tokens_by_segments.keys(), key=lambda seg: seg.bounding_box.top)
         if last_segment.text_content and len(last_segment.text_content) < 5:

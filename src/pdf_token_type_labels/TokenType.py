@@ -1,7 +1,7 @@
-from enum import StrEnum
+from enum import Enum
 
 
-class TokenType(StrEnum):
+class TokenType(Enum):
     FORMULA = "Formula"
     FOOTNOTE = "Footnote"
     LIST_ITEM = "List item"
@@ -13,6 +13,9 @@ class TokenType(StrEnum):
     SECTION_HEADER = "Section header"
     CAPTION = "Caption"
     PAGE_FOOTER = "Page footer"
+
+    def __str__(self):
+        return self.value
 
     @staticmethod
     def from_text(text: str):

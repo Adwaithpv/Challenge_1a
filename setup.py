@@ -9,6 +9,7 @@ import sys
 import subprocess
 import platform
 from pathlib import Path
+from setuptools import setup, find_packages
 
 def check_python_version():
     """Check if Python version is compatible."""
@@ -123,6 +124,42 @@ except ImportError as e:
         f.write(test_script)
     
     print("Created test_setup.py - run 'python test_setup.py' to verify")
+
+# Package configuration for setuptools
+setup(
+    name="round1a-solution",
+    version="1.0.0",
+    description="Adobe India Hackathon Round 1A PDF Processing Solution",
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    python_requires=">=3.8",
+    install_requires=[
+        "lightgbm>=3.3.0",
+        "numpy>=1.21.0",
+        "opencv-python-headless>=4.5.0",
+        "pdf2image>=1.17.0",
+        "pydantic>=1.8.0",
+        "lxml>=4.6.0",
+        "pillow>=8.3.0",
+        "pypandoc>=1.8.0",
+        "fvcore>=0.1.5",
+        "omegaconf>=2.1.0",
+        "pycocotools>=2.0.4",
+        "psutil>=5.8.0",
+        "PyMuPDF>=1.20.0",
+        "wheel>=0.37.0",
+        "setuptools>=58.0.0",
+    ],
+    extras_require={
+        "torch": ["torch", "torchvision"],
+        "detectron2": ["detectron2"],
+    },
+    include_package_data=True,
+    package_data={
+        "": ["*.yaml", "*.json", "*.pickle", "*.model"],
+    },
+    zip_safe=False,
+)
 
 def main():
     """Main setup function."""

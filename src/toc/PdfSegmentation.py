@@ -1,6 +1,7 @@
 from fast_trainer.PdfSegment import PdfSegment
 from pdf_features.PdfFeatures import PdfFeatures
 from pdf_features.PdfToken import PdfToken
+from typing import Optional
 
 
 class PdfSegmentation:
@@ -12,7 +13,7 @@ class PdfSegmentation:
     @staticmethod
     def find_segment_for_token(token: PdfToken, segments: list[PdfSegment], tokens_by_segments):
         best_score: float = 0
-        most_probable_segment: PdfSegment | None = None
+        most_probable_segment: Optional[PdfSegment] = None
         for segment in segments:
             intersection_percentage = token.bounding_box.get_intersection_percentage(segment.bounding_box)
             if intersection_percentage > best_score:

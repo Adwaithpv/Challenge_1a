@@ -6,6 +6,7 @@ import numpy as np
 from os import makedirs
 from os.path import join
 from pathlib import Path
+from typing import Union
 from PIL import Image
 from pdf2image import convert_from_path
 from pdf_features.PdfFeatures import PdfFeatures
@@ -37,7 +38,7 @@ class PdfImages:
         shutil.rmtree(IMAGES_ROOT_PATH)
 
     @staticmethod
-    def from_pdf_path(pdf_path: str | Path, pdf_name: str = "", xml_file_name: str = ""):
+    def from_pdf_path(pdf_path: Union[str, Path], pdf_name: str = "", xml_file_name: str = ""):
         xml_path = None if not xml_file_name else Path(XMLS_PATH, xml_file_name + ".xml")
 
         if xml_path and not xml_path.parent.exists():

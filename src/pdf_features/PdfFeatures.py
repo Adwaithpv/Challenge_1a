@@ -7,6 +7,7 @@ from os.path import join, exists
 from pathlib import Path
 from statistics import mode
 from subprocess import CalledProcessError
+from typing import Union, Optional
 from lxml import etree
 from lxml.etree import ElementBase, XMLSyntaxError
 from pydantic import BaseModel
@@ -49,7 +50,7 @@ class PdfFeatures(BaseModel):
             token.token_type = TokenType.from_index(labels.get_label_type(token.page_number, token.bounding_box))
 
     @staticmethod
-    def from_poppler_etree(file_path: str | Path, file_name: str | None = None, dataset: str | None = None):
+    def from_poppler_etree(file_path: Union[str, Path], file_name: Optional[str] = None, dataset: Optional[str] = None):
         try:
             file_content: str = open(file_path, errors="ignore").read()
         except (FileNotFoundError, UnicodeDecodeError, XMLSyntaxError):
@@ -59,7 +60,7 @@ class PdfFeatures(BaseModel):
 
     @staticmethod
     def from_poppler_etree_content(
-        file_path: str | Path, file_content: str, file_name: str | None = None, dataset: str | None = None
+        file_path: Union[str, Path], file_content: str, file_name: Optional[str] = None, dataset: Optional[str] = None
     ):
         if not file_content:
             return PdfFeatures.get_empty()
@@ -110,7 +111,7 @@ class PdfFeatures(BaseModel):
         return False if "File is not encrypted" in result.stdout else True
 
     @staticmethod
-    def from_pdf_path(pdf_path, xml_path: str | Path = None):
+    def from_pdf_path(pdf_path, xml_path: Union[str, Path] = None):
         remove_xml = False if xml_path else True
         xml_path = str(xml_path) if xml_path else join(tempfile.gettempdir(), "pdf_etree.xml")
 
@@ -149,7 +150,7 @@ class PdfFeatures(BaseModel):
         return pdf_features
 
     @staticmethod
-    def from_labeled_data(pdf_labeled_data_root_path: str | Path, dataset: str, pdf_name: str):
+    def from_labeled_data(pdf_labeled_data_root_path: Union[str, Path], dataset: str, pdf_name: str):
         xml_path = join(pdf_labeled_data_root_path, "pdfs", pdf_name, XML_NAME)
         pdf_features = PdfFeatures.from_poppler_etree(xml_path, pdf_name, dataset)
         token_type_label_path: str = join(pdf_labeled_data_root_path, TOKEN_TYPE_RELATIVE_PATH)
